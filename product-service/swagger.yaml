@@ -1,0 +1,65 @@
+---
+openapi: 3.0.0
+info:
+  title: product-service-dev
+  version: 1.0.2-oas3
+servers:
+- url: https://aw50qg56q5.execute-api.eu-west-1.amazonaws.com/dev
+paths:
+  /products:
+    get:
+      responses:
+        "200":
+          description: Get all products
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayOfProducts'
+  /products/{productId}:
+    get:
+      parameters:
+      - name: productId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        "400":
+          description: Invalid ID
+        "404":
+          description: Not found item
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        count:
+          type: integer
+          format: int32
+          example: 4
+        description:
+          type: string
+          example: Author – Mark Myers
+        id:
+          type: string
+          example: 7567ec4b-b10c-48c5-9345-fc73c48a80aa
+        price:
+          type: number
+          example: 2.4
+        title:
+          type: string
+          example: 'A Smarter Way to Learn JavaScript: The new tech-assisted approach that requires half the effort'
+      description: Information about product
+    ArrayOfProducts:
+      type: array
+      description: Information about products
+      items:
+        $ref: '#/components/schemas/Product'
