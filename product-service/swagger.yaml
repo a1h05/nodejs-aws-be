@@ -15,6 +15,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ArrayOfProducts'
+    post:
+      requestBody:
+        $ref: '#/components/requestBodies/ProductBody'
+      responses:
+        "201":
+          description: Create product
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
   /products/{productId}:
     get:
       parameters:
@@ -37,7 +47,32 @@ paths:
         "404":
           description: Not found item
 components:
+  requestBodies:
+    ProductBody:
+      description: A JSON object containing pet information
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProductBody'
   schemas:
+    ProductBody:
+      type: object
+      properties:
+        count:
+          type: integer
+          format: int32
+          example: 4
+        description:
+          type: string
+          example: Author – Mark Myers
+        price:
+          type: number
+          example: 2.4
+        title:
+          type: string
+          example: 'A Smarter Way to Learn JavaScript: The new tech-assisted approach that requires half the effort'
+      description: Information about product
     Product:
       type: object
       properties:
