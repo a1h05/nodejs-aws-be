@@ -26,7 +26,7 @@ export class ImageService {
   private async moveParsedFile(s3ObjectKey: string) {
     this.loggerService.log('started moving file')
     const copySource = `${this.bucketName}/${s3ObjectKey}`
-    const destination = s3ObjectKey.replace(
+    const destination = ImageService.getDecodedKey(s3ObjectKey).replace(
       this.uploadFolder,
       this.parsedFolder
     )
@@ -42,25 +42,32 @@ export class ImageService {
       `file was moved from ${copySource} to ${destination}`
     )
 
+    const deleteKey = ImageService.getDecodedKey(s3ObjectKey)
+
     await this.getS3()
       .deleteObject({
         Bucket: this.bucketName,
-        Key: s3ObjectKey,
+        Key: deleteKey,
       })
       .promise()
 
-    this.loggerService.log(`${s3ObjectKey} was deleted`)
+    this.loggerService.log(`${deleteKey} was deleted`)
   }
 
   private async parseAndLogCSV(s3ObjectKey: string): Promise<void> {
     const params = {
       Bucket: this.bucketName,
-      Key: s3ObjectKey,
+      Key: ImageService.getDecodedKey(s3ObjectKey),
     }
+    this.loggerService.log(`trying to parse and log ${JSON.stringify(params)}`)
     const s3Stream = this.getS3().getObject(params).createReadStream()
     const csvStream = csv()
     const loggerStream = this.loggerService.createLoggerStream()
     await promisifiedPipeline(s3Stream, csvStream, loggerStream)
+  }
+
+  private static getDecodedKey(s3ObjectKey: string) {
+    return decodeURIComponent(s3ObjectKey.replace(/\+/g, ' '))
   }
 
   async createSignedURL(csvFileName: string): Promise<string> {

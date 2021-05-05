@@ -3,7 +3,7 @@
     {
       "s3": {
         "object": {
-          "key": "uploaded/Book1.csv"
+          "key": "uploaded/%25D0%259A%25D0%25BD%25D0%25B8%25D0%25B3%25D0%25B0%2520%25D0%25BB%25D0%25BE%25D0%25BB%25D0%25BE%25D0%25BB.csv"
         }
       }}
   ]

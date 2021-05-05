@@ -10,8 +10,12 @@ jest.mock('csv-parser')
 
 describe('ImageService', () => {
   describe('parseFile', () => {
-    const filename = 'filename'
+    const filename =
+      '%25D0%259A%25D0%25BD%25D0%25B8%25D0%25B3%25D0%25B0%2520%25D0%25BB%25D0%25BE%25D0%25BB%25D0%25BE%25D0%25BB.csv'
+    const decodedFilename =
+      '%D0%9A%D0%BD%D0%B8%D0%B3%D0%B0%20%D0%BB%D0%BE%D0%BB%D0%BE%D0%BB.csv'
     const s3KeyObject = `uploadFolder/${filename}`
+    const decodedS3KeyObject = `uploadFolder/${decodedFilename}`
     const bucketName = 'bucketName'
     const bucketRegion = 'bucketRegion'
     const uploadFolder = 'uploadFolder'
@@ -78,7 +82,7 @@ describe('ImageService', () => {
 
       expect(getObject).toHaveBeenCalledWith({
         Bucket: bucketName,
-        Key: s3KeyObject,
+        Key: decodedS3KeyObject,
       })
       expect(loggedData).toEqual(['line1csved', 'line2csved', 'line3csved'])
     })
@@ -99,11 +103,11 @@ describe('ImageService', () => {
       expect(copyObject).toHaveBeenCalledWith({
         Bucket: bucketName,
         CopySource: `${bucketName}/${s3KeyObject}`,
-        Key: `${parsedFolder}/${filename}`,
+        Key: `${parsedFolder}/${decodedFilename}`,
       })
       expect(deleteObject).toHaveBeenCalledWith({
         Bucket: bucketName,
-        Key: s3KeyObject,
+        Key: decodedS3KeyObject,
       })
     })
   })
