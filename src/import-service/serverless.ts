@@ -28,6 +28,7 @@ const serverlessConfiguration: AWS = {
       BUCKET_NAME: 'rs-node-aws-import-service',
       UPLOAD_FOLDER: 'uploaded',
       PARSED_FOLDER: 'parsed',
+      CATALOG_ITEMS_QUEUE_URL: '${cf:product-service-dev.catalogItemsQueueURL}'
     },
     lambdaHashingVersion: '20201221',
     iamRoleStatements: [
@@ -40,6 +41,11 @@ const serverlessConfiguration: AWS = {
         Effect: 'Allow',
         Action: ['s3:*'],
         Resource: ['arn:aws:s3:::rs-node-aws-import-service/*'],
+      },
+      {
+        Effect: 'Allow',
+        Action: ['sqs:*'],
+        Resource: ['${cf:product-service-dev.catalogItemsQueueArn}'],
       },
     ],
   },

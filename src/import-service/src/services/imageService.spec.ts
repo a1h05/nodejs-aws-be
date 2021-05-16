@@ -1,15 +1,39 @@
 import { ImageService, ValidationError } from './imageService'
-import AWS from 'aws-sdk'
+import AWS, { SQS } from 'aws-sdk'
 import { mocked } from 'ts-jest/utils'
 import { LoggerService } from './loggerService'
-import { Readable, Transform, Writable } from 'stream'
+import { Readable, Transform } from 'stream'
 import csv from 'csv-parser'
+import { trimHeader } from '@libs/csv'
 
 jest.mock('aws-sdk')
 jest.mock('csv-parser')
 
 describe('ImageService', () => {
   describe('parseFile', () => {
+    const record1 = 'Imported title 1;Imported description 1;1;11'
+    const record2 = 'Imported title 2;Imported description 2;2;22'
+    const record3 = 'Imported title 3;Imported description 3;3;33'
+    const csved = {
+      [record1]: {
+        title: 'Imported title 1',
+        description: 'Imported description 1',
+        price: 1,
+        count: 11,
+      },
+      [record2]: {
+        title: 'Imported title 2',
+        description: 'Imported description 2',
+        price: 2,
+        count: 22,
+      },
+      [record3]: {
+        title: 'Imported title 3',
+        description: 'Imported description 3',
+        price: 3,
+        count: 33,
+      },
+    }
     const filename =
       '%25D0%259A%25D0%25BD%25D0%25B8%25D0%25B3%25D0%25B0%2520%25D0%25BB%25D0%25BE%25D0%25BB%25D0%25BE%25D0%25BB.csv'
     const decodedFilename =
@@ -20,16 +44,17 @@ describe('ImageService', () => {
     const bucketRegion = 'bucketRegion'
     const uploadFolder = 'uploadFolder'
     const parsedFolder = 'parsedFolder'
+    const sqsURL = 'sqsURL'
     const createCSVTransform = () =>
       new Transform({
         objectMode: true,
         transform(chunk, _2, callback) {
-          callback(null, chunk + 'csved')
+          callback(null, csved[chunk])
         },
       })
 
     const createReadableStream = () => () =>
-      Readable.from(['line1', 'line2', 'line3'])
+      Readable.from([record1, record2, record3])
 
     const prepareMock = () => {
       const createReadStream = jest.fn(createReadableStream())
@@ -44,25 +69,22 @@ describe('ImageService', () => {
         deleteObject,
       }))
       mocked(csv).mockImplementation(createCSVTransform)
-      const loggedData = []
       const loggerService = ({
         log: jest.fn(),
-        createLoggerStream: jest.fn(
-          () =>
-            new Writable({
-              write(chunk: any, _, callback: (error?: Error | null) => void) {
-                loggedData.push(chunk.toString())
-                callback()
-              },
-            })
-        ),
       } as unknown) as LoggerService
+      const sqs = ({
+        sendMessage: jest.fn(),
+      } as unknown) as SQS
+      const callCallback = (_, b) => b()
+      mocked(sqs.sendMessage).mockImplementation(callCallback as any)
       const imageService = new ImageService(
         bucketName,
         bucketRegion,
         uploadFolder,
         parsedFolder,
-        loggerService
+        loggerService,
+        sqs,
+        sqsURL
       )
       return {
         getObject,
@@ -70,21 +92,38 @@ describe('ImageService', () => {
         copyObject,
         deleteObjectPromise,
         deleteObject,
-        loggedData,
         imageService,
+        sqs,
+        sqsURL,
+        csv,
       }
     }
 
-    it('should parse file and log data', async () => {
-      const { getObject, loggedData, imageService } = prepareMock()
+    it('should parse file and send records to queue', async () => {
+      const { getObject, sqs, imageService, sqsURL, csv } = prepareMock()
 
       await imageService.parseFile(s3KeyObject)
 
+      expect(csv).toHaveBeenCalledWith({
+        separator: ';',
+        mapHeaders: trimHeader,
+      })
       expect(getObject).toHaveBeenCalledWith({
         Bucket: bucketName,
         Key: decodedS3KeyObject,
       })
-      expect(loggedData).toEqual(['line1csved', 'line2csved', 'line3csved'])
+      expect(mocked(sqs.sendMessage).mock.calls[0][0]).toEqual({
+        MessageBody: JSON.stringify(csved[record1]),
+        QueueUrl: sqsURL,
+      })
+      expect(mocked(sqs.sendMessage).mock.calls[1][0]).toEqual({
+        MessageBody: JSON.stringify(csved[record2]),
+        QueueUrl: sqsURL,
+      })
+      expect(mocked(sqs.sendMessage).mock.calls[2][0]).toEqual({
+        MessageBody: JSON.stringify(csved[record3]),
+        QueueUrl: sqsURL,
+      })
     })
 
     it('should move file', async () => {
@@ -120,7 +159,9 @@ describe('ImageService', () => {
         'bucketRegion',
         'bucketFolder',
         'parsedFolder',
-        {} as LoggerService
+        {} as LoggerService,
+        {} as SQS,
+        'sqsURL'
       )
 
       await expect(imageService.createSignedURL(null)).rejects.toEqual(
@@ -137,7 +178,9 @@ describe('ImageService', () => {
         bucketRegion,
         uploadFolder,
         'parsedFolder',
-        {} as LoggerService
+        {} as LoggerService,
+        {} as SQS,
+        'sqsURL'
       )
       const fileName = 'fileName'
       const mockGetSignedUrlPromise = jest.fn()

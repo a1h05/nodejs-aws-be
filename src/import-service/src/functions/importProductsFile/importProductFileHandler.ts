@@ -2,10 +2,7 @@ import {
   formatJSONResponse,
   ValidatedEventAPIGatewayProxyEvent,
 } from '@libs/apiGateway'
-import {
-  ImageService,
-  ValidationError,
-} from '../../services/imageService'
+import { ImageService, ValidationError } from '../../services/imageService'
 
 export class ImportProductFileHandler {
   constructor(private imageService: ImageService) {}

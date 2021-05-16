@@ -5,6 +5,7 @@ import { ImageService } from '../../services/imageService'
 
 import { FileParseHandler } from './fileParseHandler'
 import { LoggerService } from '../../services/loggerService'
+import AWS from 'aws-sdk'
 
 const loggerService = new LoggerService(console)
 const imageService = new ImageService(
@@ -12,7 +13,9 @@ const imageService = new ImageService(
   process.env.BUCKET_REGION,
   process.env.UPLOAD_FOLDER,
   process.env.PARSED_FOLDER,
-  loggerService
+  loggerService,
+  new AWS.SQS(),
+  process.env.CATALOG_ITEMS_QUEUE_URL
 )
 const handler = new FileParseHandler(imageService)
 
