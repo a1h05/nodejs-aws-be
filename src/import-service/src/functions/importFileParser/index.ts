@@ -9,8 +9,8 @@ export default {
         event: 's3:ObjectCreated:*',
         rules: [
           {
-            prefix: 'uploaded/'
-          }
+            prefix: 'uploaded/',
+          },
         ],
         cors: true,
         existing: true,

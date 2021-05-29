@@ -1,6 +1,6 @@
 import 'source-map-support/register'
 
-import { middyfy } from '@libs/lambda'
+import { middyfyHTTP } from '@libs/lambda'
 import { ProductService } from '../../services/productService'
 
 import { CreateProductHandler } from './createProductHandler'
@@ -12,7 +12,7 @@ const productService = new ProductService(dbClientService)
 const loggerService = new LoggerService(console)
 const handler = new CreateProductHandler(productService)
 
-export const main = middyfy({
+export const main = middyfyHTTP({
   handler: handler.createProductHandler,
   dbClientService,
   loggerService,

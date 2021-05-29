@@ -56,7 +56,7 @@ export class ProductService {
       product.count < 0 ||
       product.price < 0
     ) {
-      throw new ValidationError()
+      throw new ValidationError('validation error happened')
     }
 
     try {

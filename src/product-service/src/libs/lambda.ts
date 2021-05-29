@@ -7,18 +7,19 @@ import httpErrorHandler from '@middy/http-error-handler'
 import { ValidatedEventAPIGatewayProxyEvent } from '@libs/apiGateway'
 import { LoggerService } from '../services/loggerService'
 import { DbClientService } from '../services/dbClientService'
+import { SQSHandler } from 'aws-lambda/trigger/sqs'
 
-interface MiddyfyParams {
-  handler: ValidatedEventAPIGatewayProxyEvent<any>
+interface MiddyfyParams<T> {
+  handler: T
   dbClientService: DbClientService
   loggerService: LoggerService
 }
 
-export const middyfy = ({
+export const middyfyHTTP = ({
   handler,
   dbClientService,
   loggerService,
-}: MiddyfyParams) => {
+}: MiddyfyParams<ValidatedEventAPIGatewayProxyEvent<any>>) => {
   return middy(handler)
     .use(cors())
     .use(middyJsonBodyParser())
@@ -30,4 +31,14 @@ export const middyfy = ({
         fallbackMessage: 'Something went wrong',
       })
     )
+}
+
+export const middyfySQS = ({
+  handler,
+  dbClientService,
+  loggerService,
+}: MiddyfyParams<SQSHandler>) => {
+  return middy(handler)
+    .use(inputOutputLogger({ logger: loggerService.log }))
+    .use(dbConnectMiddleware({ dbClientService, loggerService }))
 }

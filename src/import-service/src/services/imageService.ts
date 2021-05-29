@@ -1,8 +1,9 @@
-import AWS from 'aws-sdk'
-import { pipeline } from 'stream'
+import AWS, { SQS } from 'aws-sdk'
+import { pipeline, Writable } from 'stream'
 import csv from 'csv-parser'
 import { LoggerService } from './loggerService'
 import { promisify } from 'util'
+import { trimHeader } from '@libs/csv'
 
 const promisifiedPipeline = promisify(pipeline)
 
@@ -14,12 +15,14 @@ export class ImageService {
     private bucketRegion: string,
     private uploadFolder: string,
     private parsedFolder: string,
-    private loggerService: LoggerService
+    private loggerService: LoggerService,
+    private sqs: SQS,
+    private sqsURL: string
   ) {}
   async parseFile(s3ObjectKey: string): Promise<void> {
     this.loggerService.log(`parseFile was invoked with ${s3ObjectKey}`)
-    await this.parseAndLogCSV(s3ObjectKey)
-    this.loggerService.log('parseAndLogCSV was executed')
+    await this.parseAndSendToQueue(s3ObjectKey)
+    this.loggerService.log('parseAndSendToQueue was executed')
     await this.moveParsedFile(s3ObjectKey)
   }
 
@@ -54,16 +57,45 @@ export class ImageService {
     this.loggerService.log(`${deleteKey} was deleted`)
   }
 
-  private async parseAndLogCSV(s3ObjectKey: string): Promise<void> {
+  private async parseAndSendToQueue(s3ObjectKey: string): Promise<void> {
     const params = {
       Bucket: this.bucketName,
       Key: ImageService.getDecodedKey(s3ObjectKey),
     }
     this.loggerService.log(`trying to parse and log ${JSON.stringify(params)}`)
     const s3Stream = this.getS3().getObject(params).createReadStream()
-    const csvStream = csv()
-    const loggerStream = this.loggerService.createLoggerStream()
-    await promisifiedPipeline(s3Stream, csvStream, loggerStream)
+    const csvStream = csv({ separator: ';', mapHeaders: trimHeader })
+    const sendToQueueStream = this.createSendToQueueStream()
+    await promisifiedPipeline(s3Stream, csvStream, sendToQueueStream)
+  }
+
+  private createSendToQueueStream = () => {
+    return new Writable({
+      objectMode: true,
+      write: (chunk, _, callback) => {
+        this.sqs.sendMessage(
+          {
+            MessageBody: JSON.stringify(chunk),
+            QueueUrl: this.sqsURL,
+          },
+          err => {
+            callback()
+            if (err) {
+              this.loggerService.log(
+                `error ${JSON.stringify(
+                  err
+                )} happened while sending ${JSON.stringify(chunk)}`
+              )
+            } else {
+              this.loggerService.log(
+                'successfully sent to queue',
+                JSON.stringify(chunk)
+              )
+            }
+          }
+        )
+      },
+    })
   }
 
   private static getDecodedKey(s3ObjectKey: string) {
