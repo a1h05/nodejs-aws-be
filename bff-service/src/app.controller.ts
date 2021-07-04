@@ -1,17 +1,42 @@
-import {Controller, All, Req, HttpException, HttpStatus, Logger, HttpService} from '@nestjs/common';
+import {
+  Controller,
+  All,
+  Req,
+  HttpException,
+  HttpStatus,
+  Logger,
+  HttpService,
+  Inject,
+  CACHE_MANAGER, Get, CacheInterceptor, UseInterceptors, CacheTTL
+} from '@nestjs/common';
 import { Request } from 'express';
 import {ConfigService} from "@nestjs/config";
 import {AxiosRequestConfig, Method} from "axios";
 import {catchError, map, tap} from "rxjs/operators";
+import {Cache} from 'cache-manager'
 
-@Controller('*')
+@Controller()
 export class AppController {
-  constructor(private configService: ConfigService, private httpService: HttpService) {}
-
+  constructor(
+      private configService: ConfigService,
+      private httpService: HttpService,
+      @Inject(CACHE_MANAGER) private cacheManager: Cache
+  ) {}
   private readonly logger = new Logger()
 
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(120)
+  @Get('product/products')
+  handleGet(@Req() req: Request): any {
+    return this.handleRequest(req);
+  }
+
   @All()
-  getHello(@Req() req: Request): any {
+  handleAll(@Req() req: Request): any {
+    return this.handleRequest(req);
+  }
+
+  private handleRequest(req: Request) {
     this.logger.log('originalUrl', req.originalUrl)
     this.logger.log('method', req.method)
     this.logger.log('body', req.body)
@@ -34,13 +59,13 @@ export class AppController {
       url: `${recipientURL}/${requestUrl}`,
       ...(Object.keys(req.body || {}).length > 0 && {data: req.body})
     }
-    console.log('axiosConfig', axiosConfig)
+    this.logger.log('axiosConfig', JSON.stringify(axiosConfig))
 
     return this.httpService.request(axiosConfig)
         .pipe(
             map(response => response.data),
             tap((response) => {
-              this.logger.log('got response from recipient', response)
+              this.logger.log('got response from recipient', JSON.stringify(response))
             }),
             catchError((err) => {
               if (!err.response) {
