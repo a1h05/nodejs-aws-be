@@ -5,26 +5,17 @@ import { ProductService } from '../../services/productService'
 
 import { CatalogBatchProcessHandler } from './catalogBatchProcessHandler'
 import { LoggerService } from '../../services/loggerService'
-import { DbClientService } from '../../services/dbClientService'
-import { NotificationService } from '../../services/notificationService'
-import { SNS } from 'aws-sdk'
+import {CommercetoolsClientService} from "../../services/commercetoolsClientService";
 
-const dbClientService = new DbClientService()
-const productService = new ProductService(dbClientService)
+const commerceToolsService = new CommercetoolsClientService()
+const productService = new ProductService(commerceToolsService)
 const loggerService = new LoggerService(console)
-const notificationService = new NotificationService(
-  loggerService,
-  new SNS({ region: process.env.SNS_REGION }),
-  process.env.SNS_ARN
-)
 const handler = new CatalogBatchProcessHandler(
   productService,
   loggerService,
-  notificationService
 )
 
 export const main = middyfySQS({
   handler: handler.catalogBatchProcessHandler,
-  dbClientService,
   loggerService,
 })

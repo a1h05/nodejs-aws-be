@@ -5,15 +5,14 @@ import { ProductService } from '../../services/productService'
 
 import { CreateProductHandler } from './createProductHandler'
 import { LoggerService } from '../../services/loggerService'
-import { DbClientService } from '../../services/dbClientService'
+import {CommercetoolsClientService} from "../../services/commercetoolsClientService";
 
-const dbClientService = new DbClientService()
-const productService = new ProductService(dbClientService)
+const commerceToolsService = new CommercetoolsClientService()
+const productService = new ProductService(commerceToolsService)
 const loggerService = new LoggerService(console)
 const handler = new CreateProductHandler(productService)
 
 export const main = middyfyHTTP({
   handler: handler.createProductHandler,
-  dbClientService,
   loggerService,
 })

@@ -1,13 +1,11 @@
 import { NewProduct, ProductService } from '../../services/productService'
 import { SQSHandler } from 'aws-lambda/trigger/sqs'
 import { LoggerService } from '../../services/loggerService'
-import { NotificationService } from '../../services/notificationService'
 
 export class CatalogBatchProcessHandler {
   constructor(
     private productService: ProductService,
     private loggerService: LoggerService,
-    private notificationService: NotificationService
   ) {}
 
   catalogBatchProcessHandler: SQSHandler = async event => {
@@ -16,8 +14,7 @@ export class CatalogBatchProcessHandler {
         JSON.parse(body)
       ).map(parsed => ({
         title: parsed.title,
-        description: parsed.description,
-        count: Number.parseInt(parsed.count, 10),
+        slug: parsed.slug,
         price: Number.parseInt(parsed.price, 10),
       }))
       for (const product of products) {
@@ -35,11 +32,9 @@ export class CatalogBatchProcessHandler {
         }
       }
 
-      const productsCount = products.reduce((acc, b) => acc + b.count, 0)
-      await this.notificationService.sendEmailNotification(
-        'Batch Process completed',
-        'Congratulations! Batch import was finished',
-        productsCount
+      this.loggerService.log(
+          'Batch Process completed',
+          'Congratulations! Batch import was finished',
       )
     } catch (e) {
       this.loggerService.log(
