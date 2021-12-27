@@ -1,0 +1,10 @@
+{
+  "Records": [
+    {
+      "body": "{\"slug\":\"imported-title-4\",\"title\":\"Imported title 4\",\"description\":\"Imported description 1\",\"price\":99}"
+    },
+    {
+      "body": "{\"slug\":\"imported-title-2\",\"title\":\"Imported title 2\",\"description\":\"Imported description 2\",\"price\":200}"
+    }
+  ]
+}

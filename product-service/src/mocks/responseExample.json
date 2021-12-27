@@ -1,0 +1,173 @@
+{
+  "type": "Cart",
+  "id": "a1e78725-aeee-4a9d-97ff-c961bb5be35c",
+  "version": 1,
+  "lastMessageSequenceNumber": 1,
+  "createdAt": "2021-12-27T16:41:51.716Z",
+  "lastModifiedAt": "2021-12-27T16:41:51.716Z",
+  "lastModifiedBy": {
+    "clientId": "njCUnYFJkOcGs6_qYzqEf583",
+    "isPlatformClient": false
+  },
+  "createdBy": {
+    "clientId": "njCUnYFJkOcGs6_qYzqEf583",
+    "isPlatformClient": false
+  },
+  "lineItems": [
+    {
+      "id": "8c6c3cd0-69cc-4012-aa10-31a8d7e9cf5a",
+      "productId": "3ebaf8b1-a03c-40bb-ae3b-8db1426fa3a2",
+      "name": {
+        "en-US": "New playstation 3"
+      },
+      "productType": {
+        "typeId": "product-type",
+        "id": "fc5302e3-72b0-4d7d-9c3e-595fdf4949dc",
+        "version": 1
+      },
+      "productSlug": {
+        "en-US": "new-playstation-5"
+      },
+      "variant": {
+        "id": 1,
+        "sku": "6",
+        "prices": [
+          {
+            "value": {
+              "type": "centPrecision",
+              "currencyCode": "EUR",
+              "centAmount": 600,
+              "fractionDigits": 2
+            },
+            "id": "86f763dc-87fd-4339-9cb9-94ccc5a6b087"
+          }
+        ],
+        "images": [],
+        "attributes": [],
+        "assets": [],
+        "availability": {
+          "isOnStock": true,
+          "availableQuantity": 12,
+          "version": 1,
+          "id": "46625184-b6cb-4d44-804c-308a5ae91d73"
+        }
+      },
+      "price": {
+        "value": {
+          "type": "centPrecision",
+          "currencyCode": "EUR",
+          "centAmount": 600,
+          "fractionDigits": 2
+        },
+        "id": "86f763dc-87fd-4339-9cb9-94ccc5a6b087"
+      },
+      "quantity": 1,
+      "discountedPricePerQuantity": [],
+      "addedAt": "2021-12-27T16:41:51.713Z",
+      "lastModifiedAt": "2021-12-27T16:41:51.713Z",
+      "state": [
+        {
+          "quantity": 1,
+          "state": {
+            "typeId": "state",
+            "id": "06936854-a82f-487d-84f4-489ed8c7f53c"
+          }
+        }
+      ],
+      "priceMode": "Platform",
+      "totalPrice": {
+        "type": "centPrecision",
+        "currencyCode": "EUR",
+        "centAmount": 600,
+        "fractionDigits": 2
+      },
+      "lineItemMode": "Standard"
+    },
+    {
+      "id": "121afac4-c257-4623-805f-f121d3099d53",
+      "productId": "3e7252f8-eaaa-457b-b74d-28bdc38fd71d",
+      "name": {
+        "en-US": "New playstation 2"
+      },
+      "productType": {
+        "typeId": "product-type",
+        "id": "fc5302e3-72b0-4d7d-9c3e-595fdf4949dc",
+        "version": 1
+      },
+      "productSlug": {
+        "en-US": "new-playstation-4"
+      },
+      "variant": {
+        "id": 1,
+        "sku": "4",
+        "prices": [
+          {
+            "value": {
+              "type": "centPrecision",
+              "currencyCode": "EUR",
+              "centAmount": 500,
+              "fractionDigits": 2
+            },
+            "id": "98e17ce2-1cc6-48b7-b05e-dbe7bc5bf893"
+          }
+        ],
+        "images": [],
+        "attributes": [],
+        "assets": [],
+        "availability": {
+          "isOnStock": true,
+          "availableQuantity": 11,
+          "version": 1,
+          "id": "e7f5b3f2-fd9b-4e83-9260-a859aa618ed0"
+        }
+      },
+      "price": {
+        "value": {
+          "type": "centPrecision",
+          "currencyCode": "EUR",
+          "centAmount": 500,
+          "fractionDigits": 2
+        },
+        "id": "98e17ce2-1cc6-48b7-b05e-dbe7bc5bf893"
+      },
+      "quantity": 1,
+      "discountedPricePerQuantity": [],
+      "addedAt": "2021-12-27T16:41:51.713Z",
+      "lastModifiedAt": "2021-12-27T16:41:51.713Z",
+      "state": [
+        {
+          "quantity": 1,
+          "state": {
+            "typeId": "state",
+            "id": "06936854-a82f-487d-84f4-489ed8c7f53c"
+          }
+        }
+      ],
+      "priceMode": "Platform",
+      "totalPrice": {
+        "type": "centPrecision",
+        "currencyCode": "EUR",
+        "centAmount": 500,
+        "fractionDigits": 2
+      },
+      "lineItemMode": "Standard"
+    }
+  ],
+  "cartState": "Active",
+  "totalPrice": {
+    "type": "centPrecision",
+    "currencyCode": "EUR",
+    "centAmount": 1100,
+    "fractionDigits": 2
+  },
+  "customLineItems": [],
+  "discountCodes": [],
+  "inventoryMode": "None",
+  "taxMode": "Disabled",
+  "taxRoundingMode": "HalfEven",
+  "taxCalculationMode": "LineItemLevel",
+  "deleteDaysAfterLastModification": 90,
+  "refusedGifts": [],
+  "origin": "Customer",
+  "itemShippingAddresses": []
+}

@@ -1,0 +1,6 @@
+{
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": "{\"items\":[{\"productId\":\"3ebaf8b1-a03c-40bb-ae3b-8db1426fa3a2\",\"count\":1},{\"productId\":\"3e7252f8-eaaa-457b-b74d-28bdc38fd71d\",\"count\":1}],\"address\":{\"comment\":\"gdfgfdgd\",\"address\":\"fdfds\",\"lastName\":\"fdsf\",\"firstName\":\"gdfgdf\"}}"
+}
